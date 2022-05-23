@@ -27,6 +27,19 @@ public class EmployeeController {
 	@Autowired
 	private  EmployeeService  service;
 
+	
+	
+	@GetMapping("/test")
+	public String linkTest()
+	{
+		try {
+			return "Ok";
+		}
+		catch(Exception e) {
+			return e.getMessage();
+		}
+	}
+	
 	@PostMapping("/add")
 	public GlobalResponse addEmployee(@RequestBody Employee employee){
 		try {
