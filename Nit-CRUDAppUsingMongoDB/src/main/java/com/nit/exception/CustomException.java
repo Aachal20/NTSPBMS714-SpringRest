@@ -1,5 +1,8 @@
 package com.nit.exception;
-public class CustomException extends RuntimeException{
+
+import java.io.Serializable;
+
+public class CustomException extends RuntimeException implements Serializable{
 	
 public CustomException() {
 	// TODO Auto-generated constructor stub
