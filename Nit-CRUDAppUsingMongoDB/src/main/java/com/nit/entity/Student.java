@@ -58,4 +58,7 @@ public class Student implements Serializable {
 	// save(Student);
 	// setStatus("InActive");
 
+
+	
+
 }

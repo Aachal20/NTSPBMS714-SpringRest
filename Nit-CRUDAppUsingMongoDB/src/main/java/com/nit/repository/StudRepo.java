@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import com.nit.entity.Student;
-
+//ReactiveQuerydslPredicateExecutor<Student>
+//, QueryDslPredicateExecutor<Hotel>
 public interface StudRepo extends MongoRepository<Student, Integer> {
 	// List<Student> findByIsActive(Boolean isActive);
 	
@@ -41,4 +43,6 @@ public interface StudRepo extends MongoRepository<Student, Integer> {
 	// @Param("category") String category);
   // @Query(from Student where status =:active AND status=: Isactive )
 
+	List<Student> findAll(String s1.addAll(String s2));
+  List<Student> 	getByStatus(String string);
 }

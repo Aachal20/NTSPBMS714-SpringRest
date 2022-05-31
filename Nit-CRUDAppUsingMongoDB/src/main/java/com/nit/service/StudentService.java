@@ -80,8 +80,22 @@ public class StudentService {
 				}*/
 
 	// @SuppressWarnings("unlikely-arg-type"
-	
+
 	public List<Student> fetchStudentByStatus() {
+
+		final String activeStatus = "active";
+		final String inActiveStatus = "Inactive";
+		//create a query class
+		Student stud = new Student();
+
+		List<Student>  filteractive = repo.getByStatus("active");
+		List<Student>  filterInactive = repo.getByStatus("Inactive");
+		// List<Student>   filterBy = stud.Rating);
+
+		// we can then pass the filters to the findAll() method
+		List<Student> list =  repo.findAll(filteractive.addAll(filterInactive));
+		return list;
+		
 		//1st way
 		/*	try {
 				List<Student> list = repo.findStudentByStatus();
@@ -91,28 +105,28 @@ public class StudentService {
 				e.printStackTrace();
 				throw new CustomException(e.getMessage());
 			}*/
-		
+
 		//2nd way
-		 List<Student> list = repo.findAll();
-		
-		 repo.findAll().stream().filter(e->e.getStatus().equals("active")).collect(Collectors.toList());
-		 System.out.println(" In Side getAllDetails");
-		 //List<Student> list = repo.findByStatus("active");
+		List<Student> list = repo.findAll();
+
+		repo.findAll().stream().filter(e->e.getStatus().equals("active")).collect(Collectors.toList());
+		System.out.println(" In Side getAllDetails");
+		//List<Student> list = repo.findByStatus("active");
 		List<Student> list1 = repo.findStudentByStatus("active", "Inactive");
 		return list1;
 		//3rd way
-		 
+
 		/*	if (student.getStatus().equals("active") ) {
 					student.setStatus("InActive");
 				student.setStatus("delete");
 					repo.save(student);
-		
+
 				List<Student> list = repo.searchStudentByStatusIn("active", "Inactive" );
 				list.forEach(System.out::println);
 				//System.out.println("List of Data :: " + list);
 				// return
 					list.stream().filter(s->s.getStatus().equals("active") ||  s.getStatus().equals("Inactive")).collect(Collectors.toList());
-		
+
 				//return list;
 				} catch (Exception e) {
 		e.printStackTrace();
@@ -195,7 +209,7 @@ public class StudentService {
 				System.out.println(" In Side getAllCount");
 				List<Student> list = repo.findByStatus("active");
 				List<Student> list1 = repo.findByStatus("Inactive");
-	
+
 				long countActive = list.stream().count();
 				long countInActive = list1.stream().count();
 				System.out.println("List of Data :: " + list);
@@ -218,7 +232,7 @@ public class StudentService {
 			// return
 			list.stream().filter(s -> s.getStatus().equals("active") || s.getStatus().equals("Inactive"))
 					.collect(Collectors.toList());
-	
+
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
