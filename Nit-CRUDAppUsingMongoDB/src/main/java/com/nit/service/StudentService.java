@@ -1,17 +1,19 @@
 package com.nit.service;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.management.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.aggregation.BooleanOperators.And;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nit.entity.Student;
 import com.nit.exception.CustomException;
@@ -25,10 +27,10 @@ public class StudentService {
 	private SequenceGenerator sequenceGenerator;
 
 	@Autowired
-	private MongoOperations mongoOperations;
+	private StudRepo repo;
 
 	@Autowired
-	private StudRepo repo;
+	private MongoOperations mongo;
 
 	public GlobalResponse addStudent(Student student) {
 		try {
@@ -65,75 +67,50 @@ public class StudentService {
 		}
 	}
 
-	/*if(student.getStatus()) {                                                    //if true then i dont want to display deleted data
-					throw new CustomException("Student deleted for this ID");
-				}
-				else {
-					return student;                                                                     //for this id we have a data and we give that data /return the data
-				}*/
-	/*List<Status> status  = repo.findByActive(true);
-				if(status.stream().filter(Inactive) !=true)){
-					return student;       
-				}
-				else {
-					throw new CustomException("Student deleted for this ID");
-				}*/
-
-	// @SuppressWarnings("unlikely-arg-type"
-
 	public List<Student> fetchStudentByStatus() {
 
 		final String activeStatus = "active";
 		final String inActiveStatus = "Inactive";
 		//create a query class
-		Student stud = new Student();
+		//Student stud = new Student();
 
-		List<Student>  filteractive = repo.getByStatus("active");
-		List<Student>  filterInactive = repo.getByStatus("Inactive");
-		// List<Student>   filterBy = stud.Rating);
+		List<Student>  filteractive = repo.findByStatus("active");
+		List<Student>  filterInactive = repo.findByStatus("Inactive");
+		System.out.println(filteractive);
+		System.out.println(filterInactive);
+
 
 		// we can then pass the filters to the findAll() method
-		List<Student> list =  repo.findAll(filteractive.addAll(filterInactive));
-		return list;
-		
-		//1st way
-		/*	try {
-				List<Student> list = repo.findStudentByStatus();
-				list.forEach(System.out::println);
-				return list;
-			} catch (Exception e) {
+		//  List<Student> list =  repo.findAll(filteractive.addAll(filterInactive));
+		return filterInactive;
+
+		/*	List<Student> list = repo.findAll();
+
+				repo.findAll().stream().filter(e->e.getStatus().equals("active")).collect(Collectors.toList());
+				System.out.println(" In Side getAllDetails");
+				//List<Student> list = repo.findByStatus("active");
+				List<Student> list1 = repo.findStudentByStatus("active", "Inactive");
+				return list1;
+				//3rd way
+
+					if (student.getStatus().equals("active") ) {
+							student.setStatus("InActive");
+						student.setStatus("delete");
+							repo.save(student);
+
+						List<Student> list = repo.searchStudentByStatusIn("active", "Inactive" );
+						list.forEach(System.out::println);
+						//System.out.println("List of Data :: " + list);
+						// return
+							list.stream().filter(s->s.getStatus().equals("active") ||  s.getStatus().equals("Inactive")).collect(Collectors.toList());
+
+						//return list;
+						} catch (Exception e) {
 				e.printStackTrace();
 				throw new CustomException(e.getMessage());
-			}*/
-
-		//2nd way
-		List<Student> list = repo.findAll();
-
-		repo.findAll().stream().filter(e->e.getStatus().equals("active")).collect(Collectors.toList());
-		System.out.println(" In Side getAllDetails");
-		//List<Student> list = repo.findByStatus("active");
-		List<Student> list1 = repo.findStudentByStatus("active", "Inactive");
-		return list1;
-		//3rd way
-
-		/*	if (student.getStatus().equals("active") ) {
-					student.setStatus("InActive");
-				student.setStatus("delete");
-					repo.save(student);
-
-				List<Student> list = repo.searchStudentByStatusIn("active", "Inactive" );
-				list.forEach(System.out::println);
-				//System.out.println("List of Data :: " + list);
-				// return
-					list.stream().filter(s->s.getStatus().equals("active") ||  s.getStatus().equals("Inactive")).collect(Collectors.toList());
-
-				//return list;
-				} catch (Exception e) {
-		e.printStackTrace();
-		throw new CustomException(e.getMessage());
-		}*/
-		// return null;
-
+				}
+				// return null;
+		 */	
 	}
 
 	public GlobalResponse changeStatus(Integer id) {
@@ -201,7 +178,7 @@ public class StudentService {
 
 	}
 
-	/*	public String getAllCount() {
+		public String getAllCount() {
 			try {
 				// List<Student> list = repo.findAll();
 				// List<Student> collect =
@@ -219,7 +196,7 @@ public class StudentService {
 				e.printStackTrace();
 				throw new CustomException(e.getMessage());
 			}
-		}*/
+		}
 
 	/*public List<Student> getAllDetails() {
 		try {
@@ -240,4 +217,58 @@ public class StudentService {
 		}
 		// return null;
 	}*/
+
+
+	public List<Student> displayStudentByStatus(Boolean asc, String status) {
+		Sort sort = Sort.by(status);
+		return repo.findAll(sort);
+	}
+
+	public List<Student> findPaginated(int pageNo, int pazeSize) {
+		Pageable paging =PageRequest.of(pageNo, pazeSize);
+		Page<Student> page = repo.findAll(paging);
+		return page.toList();
+	}
+
+	public List<Student> findStudentStatusIn() {
+
+		return repo.findAll(Sort.by(Sort.Direction.ASC, "active"));
+	}
+
+	public Map<String, Object> findStudentContainingName(int page, int limit, String sort, String lastName) {
+		try {
+			int countData = (int) repo.count();
+
+			Pageable pagingSort = null;
+			if (limit == 0) {
+				limit = countData;
+			}
+
+
+			if (sort.equals("ASC")) {
+				pagingSort = PageRequest.of(page, limit, Sort.by(lastName));
+			} else {
+				pagingSort = PageRequest.of(page, limit, Sort.by(lastName));
+				//pagingSort = PageRequest.of(page, limit, lastName);
+			}
+			Page<Student> map = repo.findAll(pagingSort);
+			Map<String, Object> response = new HashMap<>();
+			//Map<Student> map = new HashMap();
+			response.put("data", map.getContent());
+			response.put("Get currentPage Number ", map.getNumber());
+			response.put("total", map.getTotalElements());
+			response.put("totalPages count ", map.getTotalPages());
+			response.put("perPage size", map.getSize());
+			response.put("perPageElement count", map.getNumberOfElements());
+			return response ;
+
+		}catch(Exception e) {
+			throw new CustomException(e.getMessage());
+		}
+
+
+	}
+
+
+
 }

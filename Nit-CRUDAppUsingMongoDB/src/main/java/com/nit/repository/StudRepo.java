@@ -3,10 +3,11 @@ package com.nit.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor;
-import org.springframework.data.repository.query.Param;
+
+
 
 import com.nit.entity.Student;
 //ReactiveQuerydslPredicateExecutor<Student>
@@ -19,12 +20,13 @@ public interface StudRepo extends MongoRepository<Student, Integer> {
 	// void findByActive();
 	// List<Status> findByActive(boolean active);
 	// List <Student> findAll();
+	List<Student> findByStatus(String status);
 
 //	public Optional<Student>   findByIdAndStatus(Integer id , String status);
 	public Optional<Student> findByIdAndStatusIn();
 
-	@Query("from Student where status In(?1,?2)")
-	public List<Student> searchStudentByStatusIn(String status1, String status2);
+	//@Query("from Student where status In(?1,?2)")
+	//public List<Student> searchStudentByStatusIn(String status1, String status2);
 
 	public List<Student> findStudentByStatus(String s1, String s2);
 
@@ -43,6 +45,10 @@ public interface StudRepo extends MongoRepository<Student, Integer> {
 	// @Param("category") String category);
   // @Query(from Student where status =:active AND status=: Isactive )
 
-	List<Student> findAll(String s1.addAll(String s2));
-  List<Student> 	getByStatus(String string);
+	//List<Student> findAll(String s1.addAll(String s2));
+  //List<Student> 	getByStatus(String string);
+	
+	
+	Page<Student> findStudentByStatus(String active, Pageable pageable);
+//	Iterable<Student> displayStudentByOrder(boolean asc, String... properties);
 }

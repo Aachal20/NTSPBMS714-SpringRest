@@ -46,18 +46,11 @@ public class Student implements Serializable {
 	// private Boolean isActive;
 	private String status; // active inActive
 
-	// name age sal couce status
-	// aachal 20 2000 java active/inActive
+	
 
 	@Field(name = "student_address")
 	private ArrayList<Address> address; // add list of address
-	// private Address address; //add only one object
-	// id name lname age status addrs column
-	// 1 aachal z 20 active addressall
-	// student.setStatus("Active");
-	// save(Student);
-	// setStatus("InActive");
-
+	
 
 	
 
